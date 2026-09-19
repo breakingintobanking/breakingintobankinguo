@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documents &middot; Recruiting Prep Hub</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<main>
+  <section class="hero">
+    <h1>Documents &amp; Templates</h1>
+    <p>Resume templates, checklists, guides, and study material you can download directly.</p>
+  </section>
+
+  <div class="filters" id="filters"></div>
+  <div class="card-grid" id="doc-grid"></div>
+  <p class="empty-state" id="empty-state" style="display:none;">No documents in this category yet.</p>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="assets/app.js"></script>
+<script>
+  (async () => {
+    const [config, docs] = await Promise.all([
+      loadConfig(),
+      loadJSON("content/documents.json"),
+    ]);
+    renderHeader("documents", config);
+    renderFooter(config);
+
+    const grid = document.getElementById("doc-grid");
+    const emptyState = document.getElementById("empty-state");
+
+    function isExternal(file) {
+      return /^https?:\/\//i.test(file);
+    }
+
+    function render(topic) {
+      const filtered = topic === "All" ? docs : docs.filter((d) => d.topic === topic);
+      grid.innerHTML = "";
+      emptyState.style.display = filtered.length ? "none" : "block";
+      const sorted = [...filtered].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+      sorted.forEach((d) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        const href = d.file;
+        const downloadAttr = isExternal(href) ? "" : "download";
+        card.innerHTML = `
+          <span class="badge">${d.topic}${d.type ? " &middot; " + d.type : ""}</span>
+          <h3>${d.title}</h3>
+          <p>${d.description || ""}</p>
+          <p class="meta" style="color:#5a5a5a;font-size:0.8rem;">${formatDate(d.date)}</p>
+          <a class="btn secondary" href="${href}" ${downloadAttr} target="_blank" rel="noopener">
+            ${isExternal(href) ? "Open" : "Download"}
+          </a>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    renderTopicFilters(document.getElementById("filters"), config.topics, render);
+    render("All");
+  })();
+</script>
+</body>
+</html>

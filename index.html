@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recruiting Prep Hub</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<main>
+  <section class="hero">
+    <h1 id="hero-title">Recruiting Prep Hub</h1>
+    <p id="hero-tagline">Loading&hellip;</p>
+  </section>
+
+  <div class="card-grid">
+    <div class="card">
+      <span class="badge">Videos</span>
+      <h3>Workshop recordings</h3>
+      <p>Resume workshops, networking sessions, mock interviews, and technical prep &mdash; recorded so you can watch (or rewatch) on your own time.</p>
+      <a class="btn" href="videos.html">Browse videos</a>
+    </div>
+    <div class="card">
+      <span class="badge">Documents</span>
+      <h3>Templates &amp; study material</h3>
+      <p>Resume templates, checklists, technical guides, and other downloadable resources for finance and consulting recruiting.</p>
+      <a class="btn" href="documents.html">Browse documents</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="assets/app.js"></script>
+<script>
+  (async () => {
+    const config = await loadConfig();
+    renderHeader("home", config);
+    renderFooter(config);
+    document.getElementById("hero-title").textContent = config.siteTitle;
+    document.getElementById("hero-tagline").textContent = config.tagline;
+  })();
+</script>
+</body>
+</html>

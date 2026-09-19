@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin &middot; Recruiting Prep Hub</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<main>
+  <section class="hero">
+    <h1>Admin: Edit Content</h1>
+    <p>Add, edit, or remove videos and documents, then download the updated JSON file and commit it to the repo.</p>
+  </section>
+
+  <div class="admin-warning">
+    <strong>This page is not secure.</strong> There is no login and no server &mdash; anyone who finds this URL can open it.
+    It only edits JSON in your browser and never writes to the repo by itself. Nothing changes on the live site
+    until you download the file below and push it to GitHub. Don't rely on this page to keep anything private.
+  </div>
+
+  <section class="admin-section">
+    <h2>Videos</h2>
+    <form id="video-form">
+      <input type="hidden" id="video-edit-id">
+      <div class="form-grid">
+        <div>
+          <label for="video-title">Title</label>
+          <input id="video-title" required>
+        </div>
+        <div>
+          <label for="video-topic">Topic</label>
+          <select id="video-topic"></select>
+        </div>
+        <div class="full">
+          <label for="video-description">Description</label>
+          <textarea id="video-description"></textarea>
+        </div>
+        <div>
+          <label for="video-speaker">Speaker (optional)</label>
+          <input id="video-speaker">
+        </div>
+        <div>
+          <label for="video-date">Date</label>
+          <input id="video-date" type="date">
+        </div>
+        <div class="full">
+          <label for="video-youtube">YouTube URL or video ID</label>
+          <input id="video-youtube" placeholder="https://www.youtube.com/watch?v=... or just the ID" required>
+        </div>
+      </div>
+      <div class="output-actions">
+        <button type="submit" class="btn">Add / Save Video</button>
+        <button type="button" class="btn secondary" id="video-cancel">Cancel Edit</button>
+      </div>
+    </form>
+
+    <div id="video-list"></div>
+
+    <h3>videos.json</h3>
+    <div class="output-actions">
+      <button class="btn secondary" id="video-copy">Copy JSON</button>
+      <button class="btn secondary" id="video-download">Download videos.json</button>
+    </div>
+    <pre class="json-output" id="video-json"></pre>
+  </section>
+
+  <section class="admin-section">
+    <h2>Documents</h2>
+    <form id="doc-form">
+      <input type="hidden" id="doc-edit-id">
+      <div class="form-grid">
+        <div>
+          <label for="doc-title">Title</label>
+          <input id="doc-title" required>
+        </div>
+        <div>
+          <label for="doc-topic">Topic</label>
+          <select id="doc-topic"></select>
+        </div>
+        <div class="full">
+          <label for="doc-description">Description</label>
+          <textarea id="doc-description"></textarea>
+        </div>
+        <div>
+          <label for="doc-type">Type (e.g. Template, Guide)</label>
+          <input id="doc-type">
+        </div>
+        <div>
+          <label for="doc-date">Date</label>
+          <input id="doc-date" type="date">
+        </div>
+        <div class="full">
+          <label for="doc-file">File path (in <code>documents/</code>) or external URL</label>
+          <input id="doc-file" placeholder="documents/my-file.pdf or https://..." required>
+        </div>
+      </div>
+      <div class="output-actions">
+        <button type="submit" class="btn">Add / Save Document</button>
+        <button type="button" class="btn secondary" id="doc-cancel">Cancel Edit</button>
+      </div>
+    </form>
+
+    <div id="doc-list"></div>
+
+    <h3>documents.json</h3>
+    <div class="output-actions">
+      <button class="btn secondary" id="doc-copy">Copy JSON</button>
+      <button class="btn secondary" id="doc-download">Download documents.json</button>
+    </div>
+    <pre class="json-output" id="doc-json"></pre>
+  </section>
+
+  <section class="admin-section">
+    <h2>How to publish a change</h2>
+    <ol>
+      <li>Add/edit/delete entries above.</li>
+      <li>For a new document, put the actual file in the <code>documents/</code> folder first, and use that same relative path in the "File path" field.</li>
+      <li>For a new video, upload it to YouTube (unlisted is fine) and paste the link &mdash; don't put video files in the repo.</li>
+      <li>Click <strong>Download</strong> for whichever JSON changed, and save it over the existing file in <code>content/</code>.</li>
+      <li>Commit and push (<code>git add . &amp;&amp; git commit -m "Update content" &amp;&amp; git push</code>). GitHub Pages updates in a minute or two.</li>
+    </ol>
+  </section>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="assets/app.js"></script>
+<script>
+  (async () => {
+    const config = await loadConfig();
+    renderHeader("admin", config);
+    renderFooter(config);
+
+    let videos = await loadJSON("content/videos.json").catch(() => []);
+    let docs = await loadJSON("content/documents.json").catch(() => []);
+
+    function populateTopics(select) {
+      select.innerHTML = config.topics.map((t) => `<option value="${t}">${t}</option>`).join("");
+    }
+    populateTopics(document.getElementById("video-topic"));
+    populateTopics(document.getElementById("doc-topic"));
+
+    function slugify(str) {
+      return str.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    }
+
+    function uniqueId(base, existing, ignoreId) {
+      let id = base || "item";
+      let n = 2;
+      const taken = new Set(existing.filter((x) => x.id !== ignoreId).map((x) => x.id));
+      while (taken.has(id)) {
+        id = `${base}-${n}`;
+        n += 1;
+      }
+      return id;
+    }
+
+    function extractYoutubeId(input) {
+      const trimmed = input.trim();
+      const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/,
+      ];
+      for (const re of patterns) {
+        const m = trimmed.match(re);
+        if (m) return m[1];
+      }
+      return trimmed;
+    }
+
+    // ---- Videos ----
+    const videoForm = document.getElementById("video-form");
+    const videoJsonEl = document.getElementById("video-json");
+    const videoListEl = document.getElementById("video-list");
+
+    function renderVideoJson() {
+      videoJsonEl.textContent = JSON.stringify(videos, null, 2);
+    }
+
+    function renderVideoList() {
+      videoListEl.innerHTML = "";
+      [...videos].sort((a, b) => (b.date || "").localeCompare(a.date || "")).forEach((v) => {
+        const row = document.createElement("div");
+        row.className = "admin-list-item";
+        row.innerHTML = `
+          <div>
+            <strong>${v.title}</strong>
+            <div class="meta">${v.topic} &middot; ${v.date || "no date"} &middot; ${v.youtubeId}</div>
+          </div>
+          <div class="actions">
+            <button data-action="edit">Edit</button>
+            <button data-action="delete">Delete</button>
+          </div>
+        `;
+        row.querySelector('[data-action="edit"]').addEventListener("click", () => loadVideoIntoForm(v));
+        row.querySelector('[data-action="delete"]').addEventListener("click", () => {
+          if (confirm(`Delete "${v.title}"?`)) {
+            videos = videos.filter((x) => x.id !== v.id);
+            renderVideoList();
+            renderVideoJson();
+          }
+        });
+        videoListEl.appendChild(row);
+      });
+      renderVideoJson();
+    }
+
+    function loadVideoIntoForm(v) {
+      document.getElementById("video-edit-id").value = v.id;
+      document.getElementById("video-title").value = v.title;
+      document.getElementById("video-topic").value = v.topic;
+      document.getElementById("video-description").value = v.description || "";
+      document.getElementById("video-speaker").value = v.speaker || "";
+      document.getElementById("video-date").value = v.date || "";
+      document.getElementById("video-youtube").value = v.youtubeId;
+      window.scrollTo({ top: videoForm.offsetTop - 20, behavior: "smooth" });
+    }
+
+    document.getElementById("video-cancel").addEventListener("click", () => {
+      videoForm.reset();
+      document.getElementById("video-edit-id").value = "";
+    });
+
+    videoForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const editId = document.getElementById("video-edit-id").value;
+      const title = document.getElementById("video-title").value.trim();
+      const entry = {
+        id: editId || uniqueId(slugify(title), videos),
+        title,
+        description: document.getElementById("video-description").value.trim(),
+        topic: document.getElementById("video-topic").value,
+        date: document.getElementById("video-date").value,
+        speaker: document.getElementById("video-speaker").value.trim(),
+        youtubeId: extractYoutubeId(document.getElementById("video-youtube").value),
+      };
+      if (editId) {
+        videos = videos.map((v) => (v.id === editId ? entry : v));
+      } else {
+        videos = [...videos, entry];
+      }
+      videoForm.reset();
+      document.getElementById("video-edit-id").value = "";
+      renderVideoList();
+    });
+
+    document.getElementById("video-copy").addEventListener("click", () => {
+      navigator.clipboard.writeText(JSON.stringify(videos, null, 2));
+    });
+    document.getElementById("video-download").addEventListener("click", () => {
+      downloadFile("videos.json", JSON.stringify(videos, null, 2));
+    });
+
+    // ---- Documents ----
+    const docForm = document.getElementById("doc-form");
+    const docJsonEl = document.getElementById("doc-json");
+    const docListEl = document.getElementById("doc-list");
+
+    function renderDocJson() {
+      docJsonEl.textContent = JSON.stringify(docs, null, 2);
+    }
+
+    function renderDocList() {
+      docListEl.innerHTML = "";
+      [...docs].sort((a, b) => (b.date || "").localeCompare(a.date || "")).forEach((d) => {
+        const row = document.createElement("div");
+        row.className = "admin-list-item";
+        row.innerHTML = `
+          <div>
+            <strong>${d.title}</strong>
+            <div class="meta">${d.topic} &middot; ${d.date || "no date"} &middot; ${d.file}</div>
+          </div>
+          <div class="actions">
+            <button data-action="edit">Edit</button>
+            <button data-action="delete">Delete</button>
+          </div>
+        `;
+        row.querySelector('[data-action="edit"]').addEventListener("click", () => loadDocIntoForm(d));
+        row.querySelector('[data-action="delete"]').addEventListener("click", () => {
+          if (confirm(`Delete "${d.title}"?`)) {
+            docs = docs.filter((x) => x.id !== d.id);
+            renderDocList();
+            renderDocJson();
+          }
+        });
+        docListEl.appendChild(row);
+      });
+      renderDocJson();
+    }
+
+    function loadDocIntoForm(d) {
+      document.getElementById("doc-edit-id").value = d.id;
+      document.getElementById("doc-title").value = d.title;
+      document.getElementById("doc-topic").value = d.topic;
+      document.getElementById("doc-description").value = d.description || "";
+      document.getElementById("doc-type").value = d.type || "";
+      document.getElementById("doc-date").value = d.date || "";
+      document.getElementById("doc-file").value = d.file;
+      window.scrollTo({ top: docForm.offsetTop - 20, behavior: "smooth" });
+    }
+
+    document.getElementById("doc-cancel").addEventListener("click", () => {
+      docForm.reset();
+      document.getElementById("doc-edit-id").value = "";
+    });
+
+    docForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const editId = document.getElementById("doc-edit-id").value;
+      const title = document.getElementById("doc-title").value.trim();
+      const entry = {
+        id: editId || uniqueId(slugify(title), docs),
+        title,
+        description: document.getElementById("doc-description").value.trim(),
+        topic: document.getElementById("doc-topic").value,
+        date: document.getElementById("doc-date").value,
+        type: document.getElementById("doc-type").value.trim(),
+        file: document.getElementById("doc-file").value.trim(),
+      };
+      if (editId) {
+        docs = docs.map((d) => (d.id === editId ? entry : d));
+      } else {
+        docs = [...docs, entry];
+      }
+      docForm.reset();
+      document.getElementById("doc-edit-id").value = "";
+      renderDocList();
+    });
+
+    document.getElementById("doc-copy").addEventListener("click", () => {
+      navigator.clipboard.writeText(JSON.stringify(docs, null, 2));
+    });
+    document.getElementById("doc-download").addEventListener("click", () => {
+      downloadFile("documents.json", JSON.stringify(docs, null, 2));
+    });
+
+    function downloadFile(filename, content) {
+      const blob = new Blob([content], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    renderVideoList();
+    renderDocList();
+  })();
+</script>
+</body>
+</html>

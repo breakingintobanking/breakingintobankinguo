@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Videos &middot; Recruiting Prep Hub</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<main>
+  <section class="hero">
+    <h1>Workshop Videos</h1>
+    <p>Recorded sessions on resumes, networking, interviews, and technical prep.</p>
+  </section>
+
+  <div class="filters" id="filters"></div>
+  <div class="card-grid" id="video-grid"></div>
+  <p class="empty-state" id="empty-state" style="display:none;">No videos in this category yet.</p>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="assets/app.js"></script>
+<script>
+  (async () => {
+    const [config, videos] = await Promise.all([
+      loadConfig(),
+      loadJSON("content/videos.json"),
+    ]);
+    renderHeader("videos", config);
+    renderFooter(config);
+
+    const grid = document.getElementById("video-grid");
+    const emptyState = document.getElementById("empty-state");
+
+    function render(topic) {
+      const filtered = topic === "All" ? videos : videos.filter((v) => v.topic === topic);
+      grid.innerHTML = "";
+      emptyState.style.display = filtered.length ? "none" : "block";
+      const sorted = [...filtered].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+      sorted.forEach((v) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/${v.youtubeId}" title="${v.title}"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen loading="lazy"></iframe>
+          </div>
+          <span class="badge">${v.topic}</span>
+          <h3>${v.title}</h3>
+          <p>${v.description || ""}</p>
+          <p class="meta" style="color:#5a5a5a;font-size:0.8rem;">
+            ${v.speaker ? v.speaker + " &middot; " : ""}${formatDate(v.date)}
+          </p>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    renderTopicFilters(document.getElementById("filters"), config.topics, render);
+    render("All");
+  })();
+</script>
+</body>
+</html>
