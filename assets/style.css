@@ -194,6 +194,60 @@ main {
   text-align: center;
 }
 
+.auth-status {
+  font-size: 0.85rem;
+  color: #dfe7ee;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.auth-status a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.auth-status a:hover { text-decoration: underline; }
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.login-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  max-width: 420px;
+  text-align: center;
+}
+
+.login-card h1 { margin-top: 0; font-size: 1.4rem; }
+.login-card p { color: var(--text-muted); }
+.login-error { color: #b3261e; font-weight: 600; }
+
+#auth-loading {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+body.authed #auth-loading { display: none; }
+.app-shell { visibility: hidden; }
+body.authed .app-shell { visibility: visible; }
+
 footer.site-footer {
   border-top: 1px solid var(--border);
   padding: 1.5rem 1.25rem;

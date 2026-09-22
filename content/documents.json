@@ -1,11 +1,83 @@
 [
   {
-    "id": "sample-resume-template",
-    "title": "Finance Resume Template",
-    "description": "A one-page resume template formatted for banking and consulting applications.",
-    "topic": "Resume",
-    "date": "2026-01-15",
-    "type": "Template",
-    "file": "documents/resume-template.docx"
+    "id": "400-questions-technicals",
+    "title": "400 Investment Banking Interview Questions & Technicals",
+    "description": "Mergers & Inquisitions' full guide of technical and fit interview questions with answers — the classic prep resource.",
+    "topic": "Interviews",
+    "date": "2026-09-21",
+    "type": "External Guide",
+    "file": "https://mergersandinquisitions.com/400-questions-investment-banking/"
+  },
+  {
+    "id": "ask-ivy-guides",
+    "title": "Ask Ivy Interview Prep Guides",
+    "description": "Technical interview question guides and mock interview prep from Ask Ivy.",
+    "topic": "Interviews",
+    "date": "2026-09-21",
+    "type": "External Guide",
+    "file": "https://askivy.net/guides"
+  },
+  {
+    "id": "wso-behavioral-guide",
+    "title": "WSO Behavioral Interview Guide",
+    "description": "Wall Street Oasis's guide to behavioral/fit questions, with tips on structuring strong answers.",
+    "topic": "Interviews",
+    "date": "2026-09-21",
+    "type": "External Guide",
+    "file": "https://www.wallstreetoasis.com/resources/interviews/behavioral-interview-questions"
+  },
+  {
+    "id": "mi-dcf-guide",
+    "title": "M&I DCF Model Guide",
+    "description": "Mergers & Inquisitions' full walkthrough of building a DCF model, with Excel templates and video.",
+    "topic": "Technical Skills",
+    "date": "2026-09-21",
+    "type": "External Guide",
+    "file": "https://mergersandinquisitions.com/dcf-model/"
+  },
+  {
+    "id": "ib-accounting-guide",
+    "title": "IB Accounting Fundamentals",
+    "description": "Breaking Into Wall Street's accounting tutorials covering the three financial statements.",
+    "topic": "Technical Skills",
+    "date": "2026-09-21",
+    "type": "External Guide",
+    "file": "https://breakingintowallstreet.com/kb/accounting/"
+  },
+  {
+    "id": "ib-dcf-guide",
+    "title": "IB DCF Guide",
+    "description": "Breaking Into Wall Street's discounted cash flow tutorials — formulas, WACC, terminal value, and more.",
+    "topic": "Technical Skills",
+    "date": "2026-09-21",
+    "type": "External Guide",
+    "file": "https://breakingintowallstreet.com/kb/discounted-cash-flow-analysis-dcf/"
+  },
+  {
+    "id": "ib-merger-model-guide",
+    "title": "IB Merger Model Guide",
+    "description": "Breaking Into Wall Street's tutorials on building merger models and accretion/dilution analysis.",
+    "topic": "Technical Skills",
+    "date": "2026-09-21",
+    "type": "External Guide",
+    "file": "https://breakingintowallstreet.com/kb/ma-and-merger-models/"
+  },
+  {
+    "id": "ib-quick-and-dirty-lbo",
+    "title": "IB Quick & Dirty LBO Method",
+    "description": "Breaking Into Wall Street's leveraged buyout tutorials, including the quick-and-dirty LBO approach used in case studies.",
+    "topic": "Technical Skills",
+    "date": "2026-09-21",
+    "type": "External Guide",
+    "file": "https://breakingintowallstreet.com/kb/leveraged-buyouts-and-lbo-models/"
+  },
+  {
+    "id": "ib-valuation-guide",
+    "title": "IB Valuation Guide",
+    "description": "Breaking Into Wall Street's valuation tutorials covering comps, precedent transactions, and DCF.",
+    "topic": "Technical Skills",
+    "date": "2026-09-21",
+    "type": "External Guide",
+    "file": "https://breakingintowallstreet.com/kb/valuation/"
   }
 ]

@@ -24,6 +24,7 @@ function renderHeader(activePage, config) {
         ${link("videos.html", "Videos", "videos")}
         ${link("documents.html", "Documents", "documents")}
       </nav>
+      <div class="auth-status" id="auth-status"></div>
     </div>
   `;
 }
