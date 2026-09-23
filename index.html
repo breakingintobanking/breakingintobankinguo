@@ -7,10 +7,9 @@
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-<div id="auth-loading">Checking your University of Ottawa sign-in&hellip;</div>
-
 <div class="app-shell">
 <header class="site-header" id="site-header"></header>
+<div class="signup-banner" id="signup-banner"></div>
 
 <main>
   <section class="hero">
@@ -37,16 +36,13 @@
 <footer class="site-footer" id="site-footer"></footer>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3/lib/msal-browser.min.js"></script>
-<script src="assets/auth.js"></script>
 <script src="assets/app.js"></script>
 <script>
   (async () => {
-    const account = await requireAuth();
     const config = await loadConfig();
     renderHeader("home", config);
     renderFooter(config);
-    renderAuthStatus(account);
+    renderSignupBanner(config);
     document.getElementById("hero-title").textContent = config.siteTitle;
     document.getElementById("hero-tagline").textContent = config.tagline;
   })();

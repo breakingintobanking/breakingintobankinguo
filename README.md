@@ -11,12 +11,9 @@ index.html          landing page
 videos.html         lists videos from content/videos.json (YouTube embeds)
 documents.html      lists documents from content/documents.json (download links)
 admin.html          form-based editor for the two JSON files (see below)
-login.html          University of Ottawa sign-in page (see Authentication)
 assets/style.css    shared styles
 assets/app.js       shared JS helpers (fetch/render/filter)
-assets/auth.js      Microsoft sign-in logic, restricted to uOttawa's tenant
-content/config.json site title, tagline, contact email, topic list
-content/auth-config.json  your Azure app's client ID (see Authentication)
+content/config.json site title, tagline, contact email, topic list, signup form URL
 content/videos.json video entries
 content/documents.json  document entries
 documents/          the actual files that documents.json points to
@@ -38,49 +35,31 @@ Open `admin.html` in the browser. It loads the current JSON, gives you a
 form to add/edit/delete video and document entries, and produces an updated
 JSON file for you to download and commit.
 
-**`admin.html` itself still isn't "authorization" in the write-access sense** —
+**`admin.html` itself isn't "authorization" in the write-access sense** —
 it writes nothing on its own. Nothing on the live site changes until you
-download the JSON and push it yourself. But it's no longer open to anyone:
-the sign-in gate (see below) now covers `admin.html` along with every other
-page, so only people with a valid uOttawa account can even open it.
+download the JSON and push it yourself. The page is unlisted (not linked
+from anywhere in the site nav) but has no login, so don't put anything in
+it you wouldn't want a stranger who finds the URL to see.
 
 If you later want real in-browser *publishing* (skip the download/commit
 step entirely), that means moving off plain GitHub Pages to something like
 Decap CMS with a GitHub OAuth proxy — a bigger step, not needed right now.
 
-## Authentication (University of Ottawa sign-in)
+## Email signup
 
-Every page requires signing in with a real `@uottawa.ca` Microsoft account.
-This works without any backend server: Microsoft's own login page verifies
-the account, restricted to the university's specific tenant
-(`d41fdab1-7e15-4cfd-b5fa-7200e54deb6b` — this is public information,
-not a secret), and the site just checks the signed token it gets back
-before showing anything. A non-uOttawa account can't get a token from that
-login page in the first place — it's not a client-side check someone could
-bypass by editing the page.
-
-**To turn this on, you need to register a free app in Microsoft Entra ID
-(Azure AD) yourself** — this requires your own Microsoft account and can't
-be done by anyone else on your behalf. Run `./scripts/setup-azure-auth.sh`
-for an interactive walkthrough, or follow the same steps manually in
-`AZURE_SETUP.md`. Once you have your app's **Application (client) ID**, it
-goes in `content/auth-config.json` (the script does this for you):
+The site is open to everyone — no sign-in required. Instead, a "Get
+updates" banner links out to a Google Form so visitors can leave their
+email. Set the form's URL in `content/config.json`:
 
 ```json
 {
-  "clientId": "your-actual-client-id-here",
-  "redirectUri": "http://localhost:8123/login.html"
+  "googleFormUrl": "https://forms.gle/your-form-id"
 }
 ```
 
-Until you do this, every page shows a plain "sign-in isn't configured yet"
-message instead of an error — nothing is broken, it's just waiting on that
-one value.
-
-**`redirectUri` must exactly match a redirect URI registered on your Azure
-app**, and must be updated once you publish to GitHub Pages (e.g.
-`https://<username>.github.io/<repo-name>/login.html`) — register both the
-localhost one and the real one in Azure so both work.
+Responses land in the Google Sheet linked to that form — filter/sort by
+email domain there (e.g. `@uottawa.ca`) to find university students among
+signups. Until a real URL is set, the banner is hidden.
 
 ## Previewing locally
 

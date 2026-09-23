@@ -1,4 +1,0 @@
-{
-  "clientId": "REPLACE_WITH_YOUR_AZURE_APP_CLIENT_ID",
-  "redirectUri": "http://localhost:8123/login.html"
-}

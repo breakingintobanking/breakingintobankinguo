@@ -24,8 +24,20 @@ function renderHeader(activePage, config) {
         ${link("videos.html", "Videos", "videos")}
         ${link("documents.html", "Documents", "documents")}
       </nav>
-      <div class="auth-status" id="auth-status"></div>
     </div>
+  `;
+}
+
+function renderSignupBanner(config) {
+  const el = document.getElementById("signup-banner");
+  if (!el) return;
+  if (!config.googleFormUrl) {
+    el.style.display = "none";
+    return;
+  }
+  el.innerHTML = `
+    <p>Want workshop invites and recruiting tips in your inbox?
+    <a href="${config.googleFormUrl}" target="_blank" rel="noopener">Join the mailing list</a>.</p>
   `;
 }
 
